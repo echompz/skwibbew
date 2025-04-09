@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { type FC, useState, useEffect, useRef } from "react"
 import { useDraw } from "../../hooks/useDraw"
+import Image from "next/image"
 
-type pageProps = {}
+type PageProps = Record<string, never> // Empty props object properly typed
 
 interface Draw {
   prevPoint: Point | null
@@ -18,11 +18,11 @@ interface Point {
   y: number
 }
 
-const page: FC<pageProps> = ({}) => {
+const Page: FC<PageProps> = () => { // Renamed to uppercase Page
   const [isErasing, setIsErasing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const eraserRef = useRef<HTMLImageElement>(null)
-  const eraserX = useRef(20)
+  const eraserX = useRef(40)
 
   const { canvasRef, onMouseDown, clear } = useDraw(drawLine)
 
@@ -37,7 +37,7 @@ const page: FC<pageProps> = ({}) => {
     const mouseX = e.clientX - rect.left
 
     // Constrain eraser to canvas bounds
-    const boundedX = Math.max(0, Math.min(mouseX, canvas.width))
+    const boundedX = Math.max(40, Math.min(mouseX, canvas.width))
 
     // Update eraser X position
     eraserX.current = boundedX
@@ -76,7 +76,7 @@ const page: FC<pageProps> = ({}) => {
       window.removeEventListener("mousemove", handleMouseMove)
       window.removeEventListener("mouseup", handleMouseUp)
     }
-  }, [isErasing, isDragging])
+  }, [isErasing, isDragging, moveEraser]) // Added moveEraser to dependencies
 
   function drawLine({ prevPoint, current, ctx }: Draw) {
     if (isErasing) {
@@ -142,28 +142,32 @@ const page: FC<pageProps> = ({}) => {
             height={450}
             className="absolute top-[100px] left-[100px] border border-black rounded-md bg-gray-200"
           />
-          <img
+          <Image
             src="/skwibbew board.png"
             alt="Frame"
-            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            className="absolute top-0 left-0 pointer-events-none"
+            fill
+            sizes="800px"
+            priority
           />
 
           {/* Always visible, position-persistent eraser */}
-          <img
+          <Image
             ref={eraserRef}
             src="/Skwibbew eraser.png"
             alt="Eraser"
-            draggable="false" // Prevent default drag behavior
+            width={62}
+            height={38}
             className={`absolute cursor-grab ${isDragging ? "cursor-grabbing" : ""}`}
             style={{
-              width: "62px",
-              height: "38px",
               top: "550px", // Fixed Y position (adjusted to be inside the drawing area)
               left: `${eraserX.current + 100 - 31}px`, // X position saved between drags, 100 is canvas left offset
               transform: "rotate(90deg)",
               zIndex: 10,
             }}
             onMouseDown={handleEraserMouseDown}
+            draggable={false} // Prevent default drag behavior
+            priority
           />
         </div>
 
@@ -180,17 +184,19 @@ const page: FC<pageProps> = ({}) => {
 
       {/* Crab image */}
       <a href="https://github.com/echompz" className="absolute bottom-10 right-10 transition-transform duration-300 hover:rotate-12">
-        <img
+        <Image
           src="/crab.png"
           alt="Crab"
-          className="w-[100px] h-[100px]"
+          width={100}
+          height={100}
           style={{
             zIndex: 10,
           }}
+          priority
         />
       </a>
     </div>
   )
 }
 
-export default page
+export default Page
