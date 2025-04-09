@@ -1,7 +1,7 @@
 ![image](https://github.com/user-attachments/assets/908b23ff-447d-4e30-aa97-3c94966c5b5b)
 
 
-## draw!!! yes!! draw!!!!
+## skwibbew!!!!
 
 - draw inside the canvas
 - slide the eraser to erase ur drawing
